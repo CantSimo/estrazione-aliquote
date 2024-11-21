@@ -4,6 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from openai import OpenAI
 from Utils.files import leggi_file_txt, estrai_testo_pdf
 from AiServices.models import Delibera
+import langsmith as ls
 
 async def estrazione_aliquote_OpenAi(file):
     """
@@ -41,7 +42,10 @@ async def estrazione_aliquote_OpenAi(file):
     except Exception as e:
         print(e)
         return e
-    
+
+@ls.traceable(
+  tags=["estrazione-aliquote"]
+)
 async def estrazione_aliquote_LangChain_ChatOpenAi(file):
     """
     Utilizza le API di Langchain ed OpenAI per estrarre aliquote da una delibera comunale in formato PDF.

@@ -3,7 +3,11 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from AiServices.models import MatchFounded
 from config import settings
+import langsmith as ls
 
+@ls.traceable(
+  tags=["classificazione-aliquote"]
+)
 async def evaluate_classification_result(descrizione_aliquota, matches):
     """
     Valuta quale dei matches trovati corrisponde semanticamente meglio alla descrizione dell'aliquota.
