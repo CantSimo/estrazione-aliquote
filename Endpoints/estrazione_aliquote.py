@@ -3,10 +3,12 @@ from AiServices.estrazione_aliquote import estrazione_aliquote_OpenAi, estrazion
 from datetime import datetime
 from config import settings
 import json
+import langsmith as ls
 
 router = APIRouter()
 
 @router.post("/estrazione-aliquote")
+@ls.traceable(tags=["estrazione-aliquote"])
 async def estrazione_aliquote_ep(fileDelibera: UploadFile):
     """
     Endpoint per estrarre aliquote da delibere comunali

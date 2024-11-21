@@ -6,10 +6,12 @@ from AiServices.models import Delibera
 from AiServices.embeddings import GetEmbedding, GetPineconeIndex
 from AiServices.valutazione_classificazione import evaluate_classification_result
 import json
+import langsmith as ls
 
 router = APIRouter()
 
 @router.post("/classificazione-aliquote")
+@ls.traceable(tags=["classificazione-aliquote"])
 async def classificazione_aliquote_ep(file: UploadFile):
     """
     Cerca record simili in Pinecone per ciascuna aliquota fornita in un file JSON.

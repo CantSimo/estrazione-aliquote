@@ -43,9 +43,6 @@ async def estrazione_aliquote_OpenAi(file):
         print(e)
         return e
 
-@ls.traceable(
-  tags=["estrazione-aliquote"]
-)
 async def estrazione_aliquote_LangChain_ChatOpenAi(file):
     """
     Utilizza le API di Langchain ed OpenAI per estrarre aliquote da una delibera comunale in formato PDF.
