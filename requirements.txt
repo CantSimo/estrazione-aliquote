@@ -1,0 +1,17 @@
+fastapi
+PyMuPDF
+uvicorn
+pydantic
+transformers
+torch
+langchain-core
+langchain
+langchain-openai
+openai
+pinecone-client
+pandas
+python-dotenv
+httpx
+scikit-learn
+aiofiles
+python-multipart
