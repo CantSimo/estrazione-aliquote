@@ -72,7 +72,7 @@ async def call_llm(promptUser, system_content):
         max_tokens=None,
         timeout=None,
         max_retries=2, 
-        model_kwargs={"store": True})
+        model_kwargs={"store": False})
     llm = llm.with_structured_output(MatchFounded)
 
     try:

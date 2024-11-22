@@ -61,7 +61,7 @@ async def estrazione_aliquote_LangChain_ChatOpenAi(file):
         max_tokens=None,
         timeout=None,
         max_retries=2, 
-        model_kwargs={"store": True})
+        model_kwargs={"store": False})
     llm = llm.with_structured_output(Delibera)
 
     delibera_text = await estrai_testo_pdf(file)
