@@ -24,18 +24,18 @@ async def estrazione_aliquote_ep(fileDelibera: UploadFile):
     # delibera = await estrazione_aliquote_OpenAi(fileDelibera)
     delibera = await estrazione_aliquote_LangChain_ChatOpenAi(fileDelibera)
     
-    # Genera il nome del file in base al comune e alla data corrente
-    comune = delibera.comune if delibera.comune else "sconosciuto"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    file_name = f"estrazione_aliquote_{comune}_{timestamp}.json"
-    
-    file_path = f"{settings.FILE_OUT_DIR}/{file_name}"
-
     # Salva l'output in un file JSON
-    try:
-        with open(file_path, "w", encoding="utf-8") as json_file:
-            json.dump(delibera.dict(by_alias=True), json_file, ensure_ascii=False, indent=4)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Errore durante il salvataggio del file: {str(e)}")
+    if settings.SAVE_OUTPUT:
+        try:
+            # Genera il nome del file in base al comune e alla data corrente
+            comune = delibera.comune if delibera.comune else "sconosciuto"
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+            file_name = f"estrazione_aliquote_{comune}_{timestamp}.json"           
+            file_path = f"{settings.FILE_OUT_DIR}/{file_name}"
+            
+            with open(file_path, "w", encoding="utf-8") as json_file:
+                json.dump(delibera.dict(by_alias=True), json_file, ensure_ascii=False, indent=4)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Errore durante il salvataggio del file: {str(e)}")
     
     return delibera.dict()

@@ -4,12 +4,14 @@ from transformers import AutoModel, AutoTokenizer
 from pinecone import Pinecone
 import torch
 
-# Configurazione di BERT (caricata una sola volta)
-bert_tokenizer = AutoTokenizer.from_pretrained(settings.HUGGING_FACE_EMBEDDING_MODEL)
-bert_model = AutoModel.from_pretrained(settings.HUGGING_FACE_EMBEDDING_MODEL)
-
-# OpenAI Embedding model (caricato una sola volta)
-openai_embedding_model = OpenAIEmbeddings(model=settings.OPENAI_EMBEDDING_MODEL, openai_api_key=settings.OPENAI_API_KEY)
+if settings.EMBEDDING_MODEL == '0':
+    # OpenAI Embedding model (caricato una sola volta)
+    openai_embedding_model = OpenAIEmbeddings(model=settings.OPENAI_EMBEDDING_MODEL, openai_api_key=settings.OPENAI_API_KEY)
+    
+if settings.EMBEDDING_MODEL == '1':
+    # Configurazione di BERT (caricata una sola volta)
+    bert_tokenizer = AutoTokenizer.from_pretrained(settings.HUGGING_FACE_EMBEDDING_MODEL)
+    bert_model = AutoModel.from_pretrained(settings.HUGGING_FACE_EMBEDDING_MODEL)
 
 def generate_bert_embedding(text: str):
     """

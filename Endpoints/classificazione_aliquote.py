@@ -93,15 +93,16 @@ async def classificazione_aliquote_ep(file: UploadFile):
             results.append(result_entry)
 
         # Salva l'output in un file JSON
-        try:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-            file_name = f"classificazione_aliquote_{delibera.comune}_{timestamp}.json"           
-            file_path = f"{settings.FILE_OUT_DIR}/{file_name}"
+        if settings.SAVE_OUTPUT:
+            try:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+                file_name = f"classificazione_aliquote_{delibera.comune}_{timestamp}.json"           
+                file_path = f"{settings.FILE_OUT_DIR}/{file_name}"
 
-            with open(file_path, "w", encoding="utf-8") as json_file:
-                json.dump(results, json_file, ensure_ascii=False, indent=4)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Errore durante il salvataggio del file: {str(e)}")
+                with open(file_path, "w", encoding="utf-8") as json_file:
+                    json.dump(results, json_file, ensure_ascii=False, indent=4)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Errore durante il salvataggio del file: {str(e)}")
         
         return {"results": results}
 

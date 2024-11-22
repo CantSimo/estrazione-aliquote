@@ -7,6 +7,7 @@ class Settings:
 
     # Distribuzione
     PORT = int(os.getenv("PORT", 9091))  # Porta di default: 9091
+    BASE_DIR = os.path.dirname(__file__)
     
     # OpenAI parameters
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -24,6 +25,7 @@ class Settings:
     PINECONE_NUM_RESULTS = os.getenv("PINECONE_NUM_RESULTS")
 
     # output folder
+    SAVE_OUTPUT = os.getenv("SAVE_OUTPUT", "false").lower() in ("true", "1", "yes")
     FILE_OUT_DIR = os.getenv("FILE_OUT_DIR")
 
     # Embedding Model

@@ -5,6 +5,7 @@ from openai import OpenAI
 from Utils.files import leggi_file_txt, estrai_testo_pdf
 from AiServices.models import Delibera
 import langsmith as ls
+import os
 
 async def estrazione_aliquote_OpenAi(file):
     """
@@ -19,7 +20,7 @@ async def estrazione_aliquote_OpenAi(file):
     client = OpenAI()
 
     delibera_text = await estrai_testo_pdf(file)
-    prompt_text = leggi_file_txt(r"C:\Temp\BNX-AI-Estrazione-Aliquote\Files\estrazione_aliquote_prompt.txt")
+    prompt_text = leggi_file_txt(os.path.join(settings.BASE_DIR, "Files", "estrazione_aliquote_prompt.txt"))
 
     try:
         completion  = client.beta.chat.completions.parse(
@@ -64,7 +65,7 @@ async def estrazione_aliquote_LangChain_ChatOpenAi(file):
     llm = llm.with_structured_output(Delibera)
 
     delibera_text = await estrai_testo_pdf(file)
-    prompt_text = leggi_file_txt(r"C:\Temp\BNX-AI-Estrazione-Aliquote\Files\estrazione_aliquote_prompt_langchain.txt")
+    prompt_text = leggi_file_txt(os.path.join(settings.BASE_DIR, "Files", "estrazione_aliquote_prompt_langchain.txt"))
 
     try:
         #---- Chaining ------
