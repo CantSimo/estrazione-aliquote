@@ -28,7 +28,7 @@ def generate_bert_embedding(text: str):
     embedding = outputs.last_hidden_state.mean(dim=1).squeeze().tolist()
     return embedding
 
-def GetEmbedding(text: str):
+def EmbedText(text: str):
     """
     Genera embedding per il testo fornito utilizzando il modello specificato in settings.
     Args:

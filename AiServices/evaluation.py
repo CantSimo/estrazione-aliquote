@@ -1,17 +1,14 @@
 from AiServices.models import ClassificationEvaluation
-from langchain_openai.chat_models import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
 from AiServices.models import MatchFounded
-from config import settings
-import langsmith as ls
+from LLMs.openai import openai_invoke
 
-async def evaluate_classification_result(descrizione_aliquota, matches):
+async def aliquota_evaluation(descrizione_aliquota, matches):
     """
     Valuta quale dei matches trovati corrisponde semanticamente meglio alla descrizione dell'aliquota.
     
     Args:
         descrizione_aliquota (str): La descrizione dell'aliquota in delibera.
-        matches (list): Lista di possibili corrispondenze trovate in Pinecone.
+        matches (list): Lista di possibili corrispondenze trovate in database vettoriale.
         
     Returns:
         ClassificationEvaluation: Risultato della valutazione.
@@ -36,7 +33,8 @@ async def evaluate_classification_result(descrizione_aliquota, matches):
     promptUser += "Restituisci il numero della descrizione che corrisponde meglio, oppure 0 se nessuna è appropriata."
     
     # Chiamata al modello di linguaggio per la valutazione
-    best_match_index = await call_llm(promptUser, systemcontent)
+    best_match = await openai_invoke(promptUser, systemcontent, MatchFounded)
+    best_match_index = best_match.NumeroRiga
     best_match_index = best_match_index -1
 
     if best_match_index >= 0 and best_match_index < len(matches):
@@ -54,45 +52,3 @@ async def evaluate_classification_result(descrizione_aliquota, matches):
             imuCodAlq_Sub=0,
             imuCodAlq_Descrizione=""
         )
-    
-async def call_llm(promptUser, system_content):
-    """
-    Esegue una chiamata a un modello di linguaggio per elaborare una richiesta.
-    
-    Args:
-        promptUser (str): La richiesta utente da passare al modello di linguaggio.
-        system_content (str): Il contesto del ruolo del sistema per il modello.
-        
-    Returns:
-        str: La risposta del modello di linguaggio.
-    """
-    llm = ChatOpenAI(
-        model=settings.OPENAI_MODEL, 
-        temperature=0,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2, 
-        model_kwargs={"store": False})
-    llm = llm.with_structured_output(MatchFounded)
-
-    try:
-        #---- Chaining ------
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", system_content),
-                ("human", "{input}"),
-            ]
-        )
-
-        chain = prompt | llm
-        output = chain.invoke(
-                    {
-                        "input": promptUser,
-                    }
-                )
-        
-        return output.NumeroRiga
-
-    except Exception as e:
-        print(e)
-        return e    

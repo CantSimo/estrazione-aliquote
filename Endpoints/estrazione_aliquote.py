@@ -1,9 +1,12 @@
-from fastapi import APIRouter, UploadFile, HTTPException
-from AiServices.estrazione_aliquote import estrazione_aliquote_OpenAi, estrazione_aliquote_LangChain_ChatOpenAi
-from datetime import datetime
 from config import settings
-import json
+from fastapi import APIRouter, UploadFile, HTTPException
+from AiServices.models import Delibera
+from LLMs.openai import openai_invoke
+from Utils.files import leggi_file_txt, estrai_testo_pdf
+from datetime import datetime
 import langsmith as ls
+import json
+import os
 
 router = APIRouter()
 
@@ -21,8 +24,9 @@ async def estrazione_aliquote_ep(fileDelibera: UploadFile):
     if fileDelibera.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="File must be a PDF")
     
-    # delibera = await estrazione_aliquote_OpenAi(fileDelibera)
-    delibera = await estrazione_aliquote_LangChain_ChatOpenAi(fileDelibera)
+    delibera_text = await estrai_testo_pdf(fileDelibera)
+    system_content = leggi_file_txt(os.path.join(settings.BASE_DIR, "Files", "estrazione_aliquote_prompt_langchain.txt"))
+    delibera = await openai_invoke(delibera_text, system_content, Delibera)
     
     # Salva l'output in un file JSON
     if settings.SAVE_OUTPUT:

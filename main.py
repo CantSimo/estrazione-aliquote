@@ -1,6 +1,6 @@
+from config import settings
 from fastapi import FastAPI
 from Endpoints import estrazione_aliquote, ingestion_aliquote, classificazione_aliquote
-from config import settings
 import uvicorn
 
 app = FastAPI(title="BNX AI Estrazione Aliquote API")

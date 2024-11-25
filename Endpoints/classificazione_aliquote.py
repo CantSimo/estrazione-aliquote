@@ -3,8 +3,8 @@ from datetime import datetime
 from fastapi import APIRouter, UploadFile, HTTPException
 from pinecone import Pinecone
 from AiServices.models import Delibera
-from AiServices.embeddings import GetEmbedding, GetPineconeIndex
-from AiServices.valutazione_classificazione import evaluate_classification_result
+from AiServices.embeddings import EmbedText, GetPineconeIndex
+from AiServices.evaluation import aliquota_evaluation
 import json
 import langsmith as ls
 
@@ -14,7 +14,7 @@ router = APIRouter()
 @ls.traceable(tags=["classificazione-aliquote"])
 async def classificazione_aliquote_ep(file: UploadFile):
     """
-    Cerca record simili in Pinecone per ciascuna aliquota fornita in un file JSON.
+    Cerca record simili in database vettoriale per ciascuna aliquota fornita in un file JSON.
     
     Args:
         file (UploadFile): File JSON contenente un oggetto Delibera.
@@ -45,7 +45,7 @@ async def classificazione_aliquote_ep(file: UploadFile):
             descrizione = aliquota.descrizione
 
             # Genera l'embedding per la descrizione
-            query_vector = GetEmbedding(descrizione)
+            query_vector = EmbedText(descrizione)
 
             # Esegui la ricerca in Pinecone
             search_results = pinecone_index.query(
@@ -85,7 +85,7 @@ async def classificazione_aliquote_ep(file: UploadFile):
             }
 
             # Valutazione dei risultati utilizzando un LLM
-            evaluation_result = await evaluate_classification_result(aliquota.descrizione, matches)
+            evaluation_result = await aliquota_evaluation(aliquota.descrizione, matches)
 
             # Aggiungi la valutazione al risultato
             result_entry["classification_evaluation"] = evaluation_result.model_dump()

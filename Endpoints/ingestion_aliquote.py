@@ -1,7 +1,7 @@
+from config import settings
 from fastapi import APIRouter, UploadFile, HTTPException
 from pinecone import Pinecone
-from config import settings
-from AiServices.embeddings import GetEmbedding, GetPineconeIndex
+from AiServices.embeddings import EmbedText, GetPineconeIndex
 import pandas as pd
 import io
 
@@ -40,10 +40,7 @@ async def ingestion_aliquote_ep(file: UploadFile):
         df = df.fillna("")
 
         pc = Pinecone(api_key = settings.PINECONE_API_KEY)
-        # pinecone_index = pc.Index(settings.PINECONE_OPENAI_INDEX)
         pinecone_index = GetPineconeIndex(pc)
-
-        # embedding_model = OpenAIEmbeddings(model=settings.OPENAI_EMBEDDING_MODEL, openai_api_key=settings.OPENAI_API_KEY)
 
         # Itera su ogni riga del CSV
         for row_index, row in df.iterrows():
@@ -51,8 +48,7 @@ async def ingestion_aliquote_ep(file: UploadFile):
             descrizione = row['imuCodAlq_Descrizione']
 
             # Genera l'embedding
-            #embedding = embedding_model.embed_query(descrizione)
-            embedding = GetEmbedding(descrizione)
+            embedding = EmbedText(descrizione)
 
             # Prepara i metadati (tutti i valori della riga con i loro nomi di colonna)
             metadata = row.to_dict()
