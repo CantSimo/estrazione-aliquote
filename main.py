@@ -1,7 +1,10 @@
 from config import settings
 from fastapi import FastAPI
 from Endpoints import estrazione_aliquote, ingestion_aliquote, classificazione_aliquote
+from Utils.Logger import configura_logger
 import uvicorn
+
+configura_logger()
 
 app = FastAPI(title="BNX AI Estrazione Aliquote API")
 
@@ -14,3 +17,4 @@ PORT = settings.PORT
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=PORT, reload=True)
+    

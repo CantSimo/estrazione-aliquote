@@ -27,6 +27,8 @@ class Settings:
     # output folder
     SAVE_OUTPUT = os.getenv("SAVE_OUTPUT", "false").lower() in ("true", "1", "yes")
     FILE_OUT_DIR = os.getenv("FILE_OUT_DIR")
+    if not os.path.exists(FILE_OUT_DIR):
+        os.makedirs(FILE_OUT_DIR)
 
     # Embedding Model
     # 0 = OpenAI

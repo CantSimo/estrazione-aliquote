@@ -2,6 +2,7 @@ from config import settings
 from fastapi import APIRouter, UploadFile, HTTPException
 from pinecone import Pinecone
 from AiServices.embeddings import EmbedText, GetPineconeIndex
+import logging
 import pandas as pd
 import io
 
@@ -64,5 +65,6 @@ async def ingestion_aliquote_ep(file: UploadFile):
         return {"message": "Tutti i vettori sono stati caricati in Pinecone."}
 
     except Exception as e:
+        logging.exception(f"Errore durante l'invocazione dell'endpoint ingestion-aliquote: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 

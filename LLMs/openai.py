@@ -24,24 +24,19 @@ async def openai_invoke(user_content, system_content, structured_output):
     """
     llm_with_output = llm.with_structured_output(structured_output)
 
-    try:
-        #---- Chaining ------
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", system_content),
-                ("human", "{input}"),
-            ]
-        )
+    #---- Chaining ------
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_content),
+            ("human", "{input}"),
+        ]
+    )
 
-        chain = prompt | llm_with_output
-        output = chain.invoke(
-                    {
-                        "input": user_content,
-                    }
-                )
-        
-        return output
-
-    except Exception as e:
-        print(e)
-        return e    
+    chain = prompt | llm_with_output
+    output = chain.invoke(
+                {
+                    "input": user_content,
+                }
+            )
+    
+    return output
