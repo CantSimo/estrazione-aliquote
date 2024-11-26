@@ -2,7 +2,7 @@ from config import settings
 from fastapi import APIRouter, UploadFile, HTTPException
 from AiServices.models import Delibera
 from LLMs.openai import openai_invoke
-from Utils.files import leggi_file_txt, estrai_testo_pdf
+from Utils.files import leggi_file_txt, estrai_testo_pdf, sanitize_filename
 from datetime import datetime
 import langsmith as ls
 import json
@@ -34,8 +34,8 @@ async def estrazione_aliquote_ep(fileDelibera: UploadFile):
             # Genera il nome del file in base al comune e alla data corrente
             comune = delibera.comune if delibera.comune else "sconosciuto"
             timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-            file_name = f"estrazione_aliquote_{comune}_{timestamp}.json"           
-            file_path = f"{settings.FILE_OUT_DIR}/{file_name}"
+            file_name = sanitize_filename(f"estrazione_aliquote_{comune}_{timestamp}.json")   
+            file_path = os.path.join(settings.FILE_OUT_DIR, file_name) 
             
             with open(file_path, "w", encoding="utf-8") as json_file:
                 json.dump(delibera.dict(by_alias=True), json_file, ensure_ascii=False, indent=4)

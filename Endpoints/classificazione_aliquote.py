@@ -5,6 +5,8 @@ from pinecone import Pinecone
 from AiServices.models import Delibera
 from AiServices.embeddings import EmbedText, GetPineconeIndex
 from AiServices.evaluation import aliquota_evaluation
+from Utils.files import sanitize_filename
+import os
 import json
 import langsmith as ls
 import logging
@@ -96,8 +98,8 @@ async def classificazione_aliquote_ep(file: UploadFile):
         # Salva l'output in un file JSON
         if settings.SAVE_OUTPUT:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-            file_name = f"classificazione_aliquote_{delibera.comune}_{timestamp}.json"           
-            file_path = f"{settings.FILE_OUT_DIR}/{file_name}"
+            file_name = sanitize_filename(f"classificazione_aliquote_{delibera.comune}_{timestamp}.json")
+            file_path = os.path.join(settings.FILE_OUT_DIR, file_name) 
 
             with open(file_path, "w", encoding="utf-8") as json_file:
                 json.dump(results, json_file, ensure_ascii=False, indent=4)

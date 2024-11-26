@@ -4,7 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 llm = ChatOpenAI(
     model=settings.OPENAI_MODEL, 
-    temperature=0,
+    temperature=0.1,
     max_tokens=None,
     timeout=None,
     max_retries=2, 

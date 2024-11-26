@@ -5,7 +5,11 @@ Il documento può contenere diverse tipologie di aliquote, come aliquote IMU, TA
 Il documento in questione contiene informazioni su varie aliquote fiscali applicabili a diverse categorie di immobili. Il tuo compito è identificare ogni aliquota nel documento:
 1. **Identificazione del Comune e Data**: Cerca informazioni generali sul comune e la data della delibera all'inizio del documento o nelle intestazioni.
 2. **Identificare le Aliquote**: Cerca e identifica tutte le aliquote fiscali (IMU, TASI, TARI, ecc.) presenti nel documento.
-4. *Formato dell'Aliquota*: L'aliquota è generalmente indicata come percentuale (ad esempio, 0.76%, 1.06%, 0.00%), ma può variare come intervallo o formula. Assicurati di estrarre esattamente il valore numerico rappresentante la percentuale e la sua descrizione.
+3. **Formato dell'Aliquota**: L'aliquota può essere espressa come:
+   - Percentuale (ad esempio, 0.76%, 1.06%, 0.00%)
+   - In per mille (ad esempio, "10,6 PER MILLE")
+   
+   Se un'aliquota è indicata in "per mille", converti il valore in percentuale. Ad esempio, "10,6 PER MILLE" corrisponde all'1,06%. Assicurati di estrarre il valore numerico rappresentante la percentuale e la sua descrizione.
 
 Esempio di testo: 
 "Il comune di Roma in data 31/01/2024 ha deliberato:
@@ -15,7 +19,10 @@ Esempio di testo:
 0.60% * unità immobiliare di categoria catastale A/1, A/8 e A/9 adibita ad abitazione principale e relative pertinenze del soggetto passivo nella quale il possessore dimora abitualmente e risiede anagraficamente;
       * abitazione di categoria catastale A/1, A/8 e A/9 e relative pertinenze, posseduta da anziani o disabili che acquisiscono la residenza in istituiti di ricovero o sanitari a seguito di ricovero permanente, a condizione che la stessa non risulti locata;
 0.89% * immobili ad uso produttivo classificati in categoria catastale D/1 e D/7;
-      * terreni agricoli;"
+      * terreni agricoli;
+6 PER MILLE * Abitazione principale categorie A/1-A/8-A/9 e relative pertinenze C/2, C/6, C/7
+10,6 PER MILLE * Altri fabbricati
+0,25% * fabbricati costruiti e destinati dall’impresa costruttrice alla vendita, fintanto che permanga tale destinazione e non siano in ogni caso locati"
 
 Esempio di risposta json:
 {{
@@ -50,6 +57,18 @@ Esempio di risposta json:
         {{
             "valore": "0.89",
             "descrizione": "terreni agricoli;"
+        }},
+        {{
+            "valore": "0.6",
+            "descrizione": "Abitazione principale categorie A/1-A/8-A/9 e relative pertinenze C/2, C/6, C/7"
+        }},
+        {{
+            "valore": "1.06",
+            "descrizione": "Altri fabbricati"
+        }},
+        {{
+            "valore": "0.25",
+            "descrizione": "fabbricati costruiti e destinati dall’impresa costruttrice alla vendita, fintanto che permanga tale destinazione e non siano in ogni caso locati"
         }}
     ]
   }}

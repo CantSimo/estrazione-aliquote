@@ -1,6 +1,7 @@
 import fitz  # PyMuPDF
 from fastapi import UploadFile
 import json
+import re
 
 def leggi_file_pdf(percorso_pdf):
     """
@@ -74,3 +75,13 @@ def leggi_file_txt(percorso_file):
 def leggi_file_json(percorso):
     with open(percorso, 'r', encoding='utf-8') as file:
         return json.load(file)
+    
+def sanitize_filename(filename):
+    """
+    Rimuove i caratteri speciali dal nome del file per evitare errori durante il salvataggio.
+    Args:
+        filename (str): Il nome del file da sanificare.
+    Returns:
+        str: Il nome del file sanificato.
+    """
+    return re.sub(r'[^\w\-_\. ]', '_', filename)
