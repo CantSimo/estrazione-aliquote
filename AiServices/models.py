@@ -4,16 +4,26 @@ from typing import List
 class Aliquota(BaseModel):
     valore: float = Field(
         ..., 
-        alias="Valore", 
         description="Il valore dell'aliquota espresso in percentuale",
         example=1.06
     )
-    descrizione: str = Field(
+    fattispeciePrincipale: str = Field(
         ..., 
-        alias="Descrizione", 
-        description="Una descrizione che specifica a quale tipo di immobile o condizione si applica l'aliquota (ad esempio, 'abitazione principale', 'fabbricati rurali')."
+        description="Una descrizione che specifica a quale fattispecie principale appartiene l'aliquota, obbligatoria"
     )
-
+    fattispeciePersonalizzata: str = Field(
+        ..., 
+        description="Una descrizione che specifica a quale fattispecie secodaria appartiene l'aliquota, facoltativa"
+    )
+    esente: bool = Field(
+        ..., 
+        description="impostare a true se nella colonna valore e' indicata la descrizione 'esente' al posto del valore percentuale, altrimenti impostare a false.",
+    )
+    assimilazioneAbitazionePrincipale: str = Field(
+        ..., 
+        description="puo' valere 'SI', 'NO' o ''",
+        example="SI"
+        )
 class Delibera(BaseModel):
     comune: str = Field(
         ..., 

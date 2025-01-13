@@ -45,7 +45,7 @@ async def classificazione_aliquote_ep(file: UploadFile):
 
         results = []
         for aliquota in delibera.aliquote:
-            descrizione = aliquota.descrizione
+            descrizione = aliquota.fattispeciePrincipale
 
             # Genera l'embedding per la descrizione
             query_vector = EmbedText(descrizione)
@@ -82,13 +82,13 @@ async def classificazione_aliquote_ep(file: UploadFile):
             result_entry = {
                 "aliquota": {
                     "valore": aliquota.valore,
-                    "descrizione": aliquota.descrizione
+                    "descrizione": aliquota.fattispeciePrincipale
                 },
                 "matches": matches  # Tutti i match trovati
             }
 
             # Valutazione dei risultati utilizzando un LLM
-            evaluation_result = await aliquota_evaluation(aliquota.descrizione, matches)
+            evaluation_result = await aliquota_evaluation(aliquota.fattispeciePrincipale, matches)
 
             # Aggiungi la valutazione al risultato
             result_entry["classification_evaluation"] = evaluation_result.model_dump()

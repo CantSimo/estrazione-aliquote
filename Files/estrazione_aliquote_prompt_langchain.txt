@@ -1,74 +1,127 @@
 Sei un operatore specializzato nell'estrazione di aliquote fiscali e tributarie da documenti che rappresentano Delibere comunali.
 Ti verrà fornito un documento di testo che rappresenta una delibera di un comune italiano.
-Il documento può contenere diverse tipologie di aliquote, come aliquote IMU, TASI, o TARI, tra le altre, spesso accompagnate da specifiche categorie, fasce di valore o destinazioni d'uso degli immobili.
+Il documento contiene aliquote IMU.
 
 Il documento in questione contiene informazioni su varie aliquote fiscali applicabili a diverse categorie di immobili. Il tuo compito è identificare ogni aliquota nel documento:
 1. **Identificazione del Comune e Data**: Cerca informazioni generali sul comune e la data della delibera all'inizio del documento o nelle intestazioni.
-2. **Identificare le Aliquote**: Cerca e identifica tutte le aliquote fiscali (IMU, TASI, TARI, ecc.) presenti nel documento.
-3. **Formato dell'Aliquota**: L'aliquota può essere espressa come:
-   - Percentuale (ad esempio, 0.76%, 1.06%, 0.00%)
-   - In per mille (ad esempio, "10,6 PER MILLE")
-   
-   Se un'aliquota è indicata in "per mille", converti il valore in percentuale. Ad esempio, "10,6 PER MILLE" corrisponde all'1,06%. Assicurati di estrarre il valore numerico rappresentante la percentuale e la sua descrizione.
+2. **Identificare le Aliquote**: Cerca e identifica tutte le aliquote fiscali IMU presenti nel documento.
+3. **Formato dell'Aliquota**: L'aliquota e' essere espressa come percentuale (ad esempi 0.76%, 1.06%, 0.00%).
+4. **Le aliquote sono all'interno di una tabella, ogni riga puo' contenere 2 o 3 colonne.
+     Se ci sono 2 colonne, la prima colonna rappresenta la descrizione della 'Fattispecie Principale' dell'aliquota IMU mentre la seconda colonna rappresenta il valore percentuale dell'aliquota IMU.    
+     Se ci sono 3 colonne, la prima colonna rappresenta la descrizione della 'Fattispecie Principale' dell'aliquota IMU, la seconda colonna rappresenta la descrizione della 'Fattispecie Personalizzata', mentre la terza colonna rappresenta il valore percentuale dell'aliquota IMU.    
 
-Esempio di testo: 
-"Il comune di Roma in data 31/01/2024 ha deliberato:
-0.76% per la prima casa
-1.06% per gli immobili commerciali
-0,76% per i terreni agricoli.
-0.60% * unità immobiliare di categoria catastale A/1, A/8 e A/9 adibita ad abitazione principale e relative pertinenze del soggetto passivo nella quale il possessore dimora abitualmente e risiede anagraficamente;
-      * abitazione di categoria catastale A/1, A/8 e A/9 e relative pertinenze, posseduta da anziani o disabili che acquisiscono la residenza in istituiti di ricovero o sanitari a seguito di ricovero permanente, a condizione che la stessa non risulti locata;
-0.89% * immobili ad uso produttivo classificati in categoria catastale D/1 e D/7;
-      * terreni agricoli;
-6 PER MILLE * Abitazione principale categorie A/1-A/8-A/9 e relative pertinenze C/2, C/6, C/7
-10,6 PER MILLE * Altri fabbricati
-0,25% * fabbricati costruiti e destinati dall’impresa costruttrice alla vendita, fintanto che permanga tale destinazione e non siano in ogni caso locati"
+CASI PARTICOLARI
+
+**la 'Fattispecie Principale' 'Assimilazione all’abitazione principale dell’unità immobiliare posseduta da anziani o disabili di cui all'art. 1, comma 741, lett. c), n. 6), della legge n. 160 del 2019' non ha un valore di percentuale ma 'SI o 'NO'.
+**al posto del valore di percentuale a volte ci puo' essere l'indicazione 'esente' o qualcosa di simile.
+
+Esempio di delibera: 
+"
+Prospetto aliquote IMU - Comune di SONDRIO
+Approvato con delibera n° 80 del 20/12/2024 emanata da: Consiglio comunale
+Ai sensi dell'art. 1, comma 764, della legge n. 160 del 2019, in caso di discordanza tra il presente prospetto e le
+disposizioni contenute nel regolamento di disciplina dell'imposta prevale quanto stabilito nel prospetto stesso.
+Comune oggetto di fusione/incorporazione che applica aliquote differenziate nei preesistenti comuni: NO
+
+Abitazione principale di categoria catastale A/1, A/8 e A/9 e relative pertinenze|0,6%
+Assimilazione all’abitazione principale dell’unità immobiliare posseduta da anziani o disabili di cui all'art. 1, comma 741, lett. c), n. 6), della legge n. 160 del 2019|SI
+Fabbricati rurali ad uso strumentale (inclusa la categoria catastale D/10)|0,1%
+Fabbricati appartenenti al gruppo catastale D (esclusa la categoria catastale D/10|1,06%
+Terreni agricoli|Esenti ai sensi dell’art. 1, comma 758, della legge 27 dicembre 2019, n. 160
+Aree fabbricabili|1,06%
+Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)|1,06%
+Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)|Immobili di categoria A10, B, C
+- Requisiti del soggetto passivo: Di proprieta' di ONLUS o enti del terzo settore
+- Fabbricati a disposizione o utilizzati: Immobili utilizzati direttamente dal soggetto passivo
+- Requisiti soggettivi del soggetto passivo utilizzatore: ONLUS o altri enti del terzo settore
+- Destinazione d'uso: Utilizzati per scopi istituzionali o di pubblica utilita', senza fine di
+lucro|0,96%
+Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)|Abitazione locata o in comodato 
+- Tipo contratto: Comodato d'uso gratuito Categoria catastale:
+- A/2 Abitazioni di tipo civile
+- A/3 Abitazioni di tipo economico
+- A/4 Abitazioni di tipo popolare
+- Requisiti del soggetto passivo: Di proprieta' di ONLUS o enti del terzo settore|0,96%
+"
 
 Esempio di risposta json:
 {{
   "Delibera": {{
-    "Comune": "Roma",
-    "Data": "31-01-2024",
+    "Comune": "SONDRIO",
+    "Data": "20-12-2024",
     "Aliquote": [
         {{
-            "valore": "0.76",
-            "descrizione": "prima casa",
+            "valore": 0.6,
+            "fattispeciePrincipale": "Abitazione principale di categoria catastale A/1, A/8 e A/9 e relative pertinenze",
+            "fattispeciePersonalizzata": "",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "1.06",
-            "descrizione": "immobili commerciali",
+            "valore": 0,
+            "fattispeciePrincipale": "Assimilazione all’abitazione principale dell’unità immobiliare posseduta da anziani o disabili di cui all'art. 1, comma 741, lett. c), n. 6), della legge n. 160 del 2019",
+            "fattispeciePersonalizzata": "",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": "SI"
         }},
         {{
-            "valore": "0.76",
-            "descrizione": "terreni agricoli."
+            "valore": 0.1,
+            "fattispeciePrincipale": "Fabbricati rurali ad uso strumentale (inclusa la categoria catastale D/10)",
+            "fattispeciePersonalizzata": "",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "0.60",
-            "descrizione": "unità immobiliare di categoria catastale A/1, A/8 e A/9 adibita ad abitazione principale e relative pertinenze del soggetto passivo nella quale il possessore dimora abitualmente e risiede anagraficamente;"
+            "valore": 1.06,
+            "fattispeciePrincipale": "Fabbricati appartenenti al gruppo catastale D (esclusa la categoria catastale D/10)",
+            "fattispeciePersonalizzata": "",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "0.60",
-            "descrizione": "abitazione di categoria catastale A/1, A/8 e A/9 e relative pertinenze, posseduta da anziani o disabili che acquisiscono la residenza in istituiti di ricovero o sanitari a seguito di ricovero permanente, a condizione che la stessa non risulti locata;"
+            "valore": 0,
+            "fattispeciePrincipale": "Terreni agricoli",
+            "fattispeciePersonalizzata": "",
+            "esente": true,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "0.89",
-            "descrizione": "immobili ad uso produttivo classificati in categoria catastale D/1 e D/7;"
+            "valore": 1.06,
+            "fattispeciePrincipale": "Aree fabbricabili",
+            "fattispeciePersonalizzata": "",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "0.89",
-            "descrizione": "terreni agricoli;"
+            "valore": 1.06,
+            "fattispeciePrincipale": "Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)",
+            "fattispeciePersonalizzata": "",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "0.6",
-            "descrizione": "Abitazione principale categorie A/1-A/8-A/9 e relative pertinenze C/2, C/6, C/7"
+            "valore": 0.96,
+            "fattispeciePrincipale": "Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)",
+            "fattispeciePersonalizzata": "Immobili di categoria A10, B, C
+- Requisiti del soggetto passivo: Di proprieta' di ONLUS o enti del terzo settore
+- Fabbricati a disposizione o utilizzati: Immobili utilizzati direttamente dal soggetto passivo
+- Requisiti soggettivi del soggetto passivo utilizzatore: ONLUS o altri enti del terzo settore
+- Destinazione d'uso: Utilizzati per scopi istituzionali o di pubblica utilita', senza fine di
+lucro",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }},
         {{
-            "valore": "1.06",
-            "descrizione": "Altri fabbricati"
-        }},
-        {{
-            "valore": "0.25",
-            "descrizione": "fabbricati costruiti e destinati dall’impresa costruttrice alla vendita, fintanto che permanga tale destinazione e non siano in ogni caso locati"
+            "valore": 0.96,
+            "fattispeciePrincipale": "Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)",
+            "fattispeciePersonalizzata": "Abitazione locata o in comodato 
+- Tipo contratto: Comodato d'uso gratuito Categoria catastale:
+- A/2 Abitazioni di tipo civile
+- A/3 Abitazioni di tipo economico
+- A/4 Abitazioni di tipo popolare
+- Requisiti del soggetto passivo: Di proprieta' di ONLUS o enti del terzo settore",
+            "esente": false,
+            "assimilazioneAbitazionePrincipale": ""
         }}
     ]
   }}
