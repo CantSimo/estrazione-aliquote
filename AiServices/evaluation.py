@@ -4,7 +4,7 @@ from LLMs.openai import openai_invoke
 
 async def aliquota_evaluation(descrizione_aliquota, matches):
     """
-    Valuta quale dei matches trovati corrisponde semanticamente meglio alla descrizione dell'aliquota.
+    Valuta quale dei matches trovati corrisponde o riassume meglio la descrizione dell'aliquota.
     
     Args:
         descrizione_aliquota (str): La descrizione dell'aliquota in delibera.
@@ -16,10 +16,9 @@ async def aliquota_evaluation(descrizione_aliquota, matches):
     
     # Definisci il contenuto del role system per guidare meglio il comportamento del modello
     systemcontent = (
-        "Sei un assistente esperto nella classificazione di aliquote fiscali. "
-        "Il tuo compito è identificare quale delle descrizioni fornite più si avvicina semanticamente alla descrizione fornita dall'aliquota. "
+        "Sei un assistente esperto nella classificazione di aliquote fiscali IMU. "
+        "Il tuo compito è identificare quale delle descrizioni fornite si avvicina di più o riassume meglio la descrizione fornita dell'aliquota. "
         "Se nessuna corrisponde adeguatamente, restituisci il valore 0. "
-        "Considera accuratamente la descrizione delle categorie catastali."
     )
 
     # Costruisci il prompt per l'LLM
@@ -30,7 +29,7 @@ async def aliquota_evaluation(descrizione_aliquota, matches):
     for i, match in enumerate(matches):
         promptUser += f"{i + 1}. {match['imuCodAlq_Descrizione']}\n"
 
-    promptUser += "Restituisci il numero della descrizione che corrisponde meglio, oppure 0 se nessuna è appropriata."
+    promptUser += "Restituisci il numero della descrizione che corrisponde o riassume meglio, oppure 0 se nessuna è appropriata."
     
     # Chiamata al modello di linguaggio per la valutazione
     best_match = await openai_invoke(promptUser, systemcontent, MatchFounded)
