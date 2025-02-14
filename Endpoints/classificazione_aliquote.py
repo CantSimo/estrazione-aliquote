@@ -1,9 +1,9 @@
 from config import settings
 from datetime import datetime
 from fastapi import APIRouter, UploadFile, HTTPException
-from pinecone import Pinecone
+import chromadb
 from AiServices.models import Delibera
-from AiServices.embeddings import EmbedText, GetPineconeIndex
+from AiServices.embeddings import EmbedText
 from AiServices.evaluation import aliquota_evaluation
 from Utils.files import sanitize_filename
 import os
@@ -13,6 +13,17 @@ import logging
 
 router = APIRouter()
 
+def safe_int(value, default=0):
+    """
+    Converte value in intero, restituendo default se value è una stringa vuota, None o non convertibile.
+    """
+    try:
+        if value is None or (isinstance(value, str) and value.strip() == ""):
+            return default
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+        
 @router.post("/classificazione-aliquote")
 @ls.traceable(tags=["classificazione-aliquote"])
 async def classificazione_aliquote_ep(file: UploadFile):
@@ -36,60 +47,67 @@ async def classificazione_aliquote_ep(file: UploadFile):
 
         # Convalida il contenuto
         try:
-             delibera = Delibera(**delibera_data)
+            delibera = Delibera(**delibera_data)
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Formato JSON non valido: {str(e)}")
 
-        pc = Pinecone(api_key = settings.PINECONE_API_KEY)
-        pinecone_index = GetPineconeIndex(pc)
+        # Inizializza il client di ChromaDB e ottieni la collection
+        chroma_client = chromadb.PersistentClient(path=settings.CHROMA_DB_PATH)
+        collection = chroma_client.get_or_create_collection(name="aliquote_collection")
 
         results = []
-        for aliquota in delibera.aliquote:
+        for aliquota in delibera.Aliquote:
             descrizione = aliquota.fattispeciePrincipale + " " + aliquota.fattispeciePersonalizzata
 
             # Genera l'embedding per la descrizione
             query_vector = EmbedText(descrizione)
 
-            # Esegui la ricerca in Pinecone
-            search_results = pinecone_index.query(
-                vector=query_vector,
-                top_k=int(settings.PINECONE_NUM_RESULTS), 
-                include_metadata=True  # Includi i metadati nel risultato
+            # Definisci i filtri per i metadati
+#            metadata_filters = {
+#                "imuCodAlq_Codice": {"$eq": aliquota.Filtra()},  # Esempio di filtro per imuCodAlq_Codice
+#            }
+
+#            # Esegui la ricerca in Chroma
+#            search_results = collection.query(
+#                query_embeddings=[query_vector],
+#                n_results=settings.CHROMA_NUM_RESULTS,
+#                where=metadata_filters
+#            )
+
+            # Esegui la ricerca in Chroma
+            search_results = collection.query(
+                query_embeddings=[query_vector],
+                n_results=settings.CHROMA_NUM_RESULTS
             )
 
-            # Salva tutti i risultati trovati
+            # Processa i risultati
             matches = []
-            for match in search_results.get("matches", []):
-                # Gestisci i metadati vuoti o nulli
-                try:
-                    imu_cod_alq_codice = int(match["metadata"].get("imuCodAlq_Codice", 0))  # Default a 0 se vuoto
-                except ValueError:
-                    imu_cod_alq_codice = 0
+            for idx, doc_id in enumerate(search_results["ids"][0]):
+                metadata = search_results["metadatas"][0][idx]
 
-                try:
-                    imu_cod_alq_sub = int(match["metadata"].get("imuCodAlq_Sub", 0))  # Default a 0 se vuoto
-                except ValueError:
-                    imu_cod_alq_sub = 0                
+                # Gestione dei metadati mancanti
+                imu_cod_alq_codice = safe_int(metadata.get("imuCodAlq_Codice", 0))
+                imu_cod_alq_sub = safe_int(metadata.get("imuCodAlq_Sub", 0))
 
                 matches.append({
-                    "id": match["id"],
-                    "score": match["score"],
+                    "id": doc_id,
+                    "score": search_results["distances"][0][idx],
                     "imuCodAlq_Codice": imu_cod_alq_codice,
                     "imuCodAlq_Sub": imu_cod_alq_sub,
-                    "imuCodAlq_Descrizione": match["metadata"]["imuCodAlq_Descrizione"],
+                    "imuCodAlq_Descrizione": metadata.get("imuCodAlq_Descrizione", "")
                 })
 
             result_entry = {
                 "aliquota": {
                     "valore": aliquota.valore,
-                    "fattispecie Principale": aliquota.fattispeciePrincipale,
-                    "fattispecie Personalizzata": aliquota.fattispeciePersonalizzata
+                    "fattispeciePrincipale": aliquota.fattispeciePrincipale,
+                    "fattispeciePersonalizzata": aliquota.fattispeciePersonalizzata
                 },
                 "matches": matches  # Tutti i match trovati
             }
 
             # Valutazione dei risultati utilizzando un LLM
-            evaluation_result = await aliquota_evaluation(aliquota.fattispeciePrincipale + " " + aliquota.fattispeciePersonalizzata, matches)
+            evaluation_result = await aliquota_evaluation(descrizione, matches)
 
             # Aggiungi la valutazione al risultato
             result_entry["classification_evaluation"] = evaluation_result.model_dump()
@@ -99,12 +117,12 @@ async def classificazione_aliquote_ep(file: UploadFile):
         # Salva l'output in un file JSON
         if settings.SAVE_OUTPUT:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-            file_name = sanitize_filename(f"classificazione_aliquote_{delibera.comune}_{timestamp}.json")
-            file_path = os.path.join(settings.FILE_OUT_DIR, file_name) 
+            file_name = sanitize_filename(f"classificazione_aliquote_{delibera.Comune}_{timestamp}.json")
+            file_path = os.path.join(settings.FILE_OUT_DIR, file_name)
 
             with open(file_path, "w", encoding="utf-8") as json_file:
                 json.dump(results, json_file, ensure_ascii=False, indent=4)
-        
+
         return {"results": results}
 
     except Exception as e:

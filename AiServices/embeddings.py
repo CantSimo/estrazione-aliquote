@@ -1,7 +1,6 @@
 from config import settings
 from langchain_openai import OpenAIEmbeddings
 from transformers import AutoModel, AutoTokenizer
-from pinecone import Pinecone
 import torch
 
 if settings.EMBEDDING_MODEL == '0':
@@ -51,22 +50,3 @@ def EmbedText(text: str):
         raise ValueError("EMBEDDING_MODEL non supportato. Usa 0 (OpenAI) o 1 (Hugging Face).")        
     
     return Embedding
-
-def GetPineconeIndex(pc: Pinecone):
-    """
-    Ritorna il nome del Database di Pinecone utilizzando il modello specificato in settings.
-        Embedding Model: 0 = OpenAI; 1 = Hugging Face 
-    Returns:
-        list: Il nome del database.
-    Raises:
-        ValueError: Se EMBEDDING_MODEL ha un valore non supportato.
-    """
-
-    if settings.EMBEDDING_MODEL == '0':
-        index = pc.Index(settings.PINECONE_OPENAI_INDEX)
-    elif settings.EMBEDDING_MODEL == '1':
-        index = pc.Index(settings.PINECONE_HUGGING_FACE_INDEX)
-    else:
-        raise ValueError("EMBEDDING_MODEL non supportato. Usa 0 (OpenAI) o 1 (Hugging Face).")        
-    
-    return index

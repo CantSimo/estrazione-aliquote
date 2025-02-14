@@ -4,11 +4,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
+    CHROMA_NUM_RESULTS = int(os.getenv("CHROMA_NUM_RESULTS"))
+    CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "./Files/Database")
 
     # Distribuzione
     PORT = int(os.getenv("PORT", 9091))  # Porta di default: 9091
     BASE_DIR = os.path.dirname(__file__)
-    
+
     # OpenAI parameters
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     OPENAI_MODEL = os.getenv("OPENAI_MODEL")
@@ -16,13 +18,6 @@ class Settings:
 
     # Huggin Face parameters
     HUGGING_FACE_EMBEDDING_MODEL = os.getenv("HUGGING_FACE_EMBEDDING_MODEL")
-
-    # Vector database
-    PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-    PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
-    PINECONE_OPENAI_INDEX = os.getenv("PINECONE_OPENAI_INDEX")
-    PINECONE_HUGGING_FACE_INDEX = os.getenv("PINECONE_HUGGING_FACE_INDEX")
-    PINECONE_NUM_RESULTS = os.getenv("PINECONE_NUM_RESULTS")
 
     # output folder
     SAVE_OUTPUT = os.getenv("SAVE_OUTPUT", "false").lower() in ("true", "1", "yes")

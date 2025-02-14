@@ -32,7 +32,7 @@ async def estrazione_aliquote_ep(fileDelibera: UploadFile):
         # Salva l'output in un file JSON
         if settings.SAVE_OUTPUT:
             # Genera il nome del file in base al comune e alla data corrente
-            comune = delibera.comune if delibera.comune else "sconosciuto"
+            comune = delibera.Comune if delibera.Comune else "sconosciuto"
             timestamp = datetime.now().strftime("%Y%m%d_%H%M")
             file_name = sanitize_filename(f"estrazione_aliquote_{comune}_{timestamp}.json")   
             file_path = os.path.join(settings.FILE_OUT_DIR, file_name) 

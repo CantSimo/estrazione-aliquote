@@ -8,11 +8,10 @@ python-multipart
 httpx
 scikit-learn
 aiofiles
-langchain==0.3.7
-langchain-core==0.3.19
-langchain-openai==0.2.8
-pinecone-client==5.0.1
-torch==2.5.1
-transformers==4.46.2
-openai==1.54.4
+langchain
+langchain-core
+langchain-openai
+torch
+transformers
+openai
 

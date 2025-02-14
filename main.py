@@ -1,6 +1,6 @@
 from config import settings
 from fastapi import FastAPI
-from Endpoints import estrazione_aliquote, ingestion_aliquote, classificazione_aliquote
+from Endpoints import estrazione_aliquote, ingestion_aliquote, classificazione_aliquote, aggiungi_aliquota
 from Utils.Logger import configura_logger
 import uvicorn
 
@@ -12,6 +12,7 @@ app = FastAPI(title="BNX AI Estrazione Aliquote API")
 app.include_router(ingestion_aliquote.router)
 app.include_router(estrazione_aliquote.router)
 app.include_router(classificazione_aliquote.router)
+app.include_router(aggiungi_aliquota.router)
 
 PORT = settings.PORT
 

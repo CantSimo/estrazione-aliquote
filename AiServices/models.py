@@ -24,20 +24,50 @@ class Aliquota(BaseModel):
         description="puo' valere 'SI', 'NO' o ''",
         example="SI"
         )
-class Delibera(BaseModel):
-    comune: str = Field(
+    def Filtra(self):
+        if self.fattispeciePrincipale == "Abitazione principale di categoria catastale A/1, A/8 e A/9 e relative pertinenze":
+            return 1
+        elif self.fattispeciePrincipale == "Assimilazione all’abitazione principale dell’unità immobiliare posseduta da anziani o disabili di cui all'art. 1, comma 741, lett. c), n. 6), della legge n. 160 del 2019":
+            return 2
+        elif self.fattispeciePrincipale == "Fabbricati rurali ad uso strumentale (inclusa la categoria catastale D/10)":
+            return 3
+        elif self.fattispeciePrincipale == "Fabbricati appartenenti al gruppo catastale D (esclusa la categoria catastale D/10)":
+            return 4
+        elif self.fattispeciePrincipale == "Terreni agricoli":
+            return 5
+        elif self.fattispeciePrincipale == "Aree fabbricabili":
+            return 6
+        elif self.fattispeciePrincipale == "Altri fabbricati (fabbricati diversi dall'abitazione principale e dai fabbricati appartenenti al gruppo catastale D)":
+            return 7
+
+class NewAliquota(BaseModel):
+    Codice: int = Field(
         ..., 
-        alias="Comune", 
+        description="Codice Aliquota",
+        example=1
+    )        
+    SubCodice: str = Field(
+        ..., 
+        description="Subcodice, progressivo all'interno del Codice",
+        example='0098'
+    )        
+
+    FattispeciePersonalizzata: str = Field(
+        ..., 
+        description="Una descrizione che specifica a quale fattispecie principale appartiene l'aliquota, obbligatoria"
+    )
+
+class Delibera(BaseModel):
+    Comune: str = Field(
+        ..., 
         description="Il nome del comune che ha emesso la delibera fiscale."
     )
-    data: str = Field(
+    Data: str = Field(
         ..., 
-        alias="Data", 
         description="La data in cui è stata emessa la delibera, nel formato giorno-mese-anno."
     )
-    aliquote: List[Aliquota] = Field(
+    Aliquote: List[Aliquota] = Field(
         ..., 
-        alias="Aliquote", 
         description="L'elenco delle aliquote applicabili contenute nella delibera, ciascuna associata a specifici gruppi e categorie catastali."
     )
 
@@ -65,5 +95,4 @@ class MatchFounded(BaseModel):
         ..., 
         description="Numero della descrizione che corrisponde meglio, oppure 0 se nessuna è appropriata."
     )
-
 
